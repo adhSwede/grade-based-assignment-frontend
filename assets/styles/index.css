@@ -1,0 +1,90 @@
+@import url("https://fonts.googleapis.com/css2?family=Bree+Serif&display=swap");
+
+* {
+  margin: 0;
+  padding: 0;
+  border: dashed 1px rgba(0, 0, 0, 0.4);
+  /* TODO: Remove border after */
+}
+
+body {
+  height: 100vh;
+  background-color: #ffe799;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  padding: 1rem;
+  gap: 1rem;
+  background-color: #fff;
+  height: 80%;
+}
+
+.buttons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.buttons button {
+  padding: 1rem;
+  width: 50%;
+}
+
+/*===========================================================
+      Start Page
+============================================================= */
+.start-page {
+  display: none;
+}
+
+.random-drink-name {
+  text-align: center;
+  font-size: 2.5rem;
+  font-family: "Bree Serif", Arial, Helvetica, sans-serif;
+  background: -webkit-linear-gradient(#fa472f, #f6a118);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 0.5px;
+}
+
+.nav-bar {
+  display: flex;
+  gap: 0.5rem;
+  width: 100vw;
+  padding: 1rem;
+  background-color: #ffe799;
+}
+
+.start-page-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.start-page-buttons button {
+  padding: 1rem;
+  width: 25%;
+}
+
+.preview-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 43rem;
+  width: 40rem;
+  overflow: hidden;
+  border-radius: 20px;
+  background-color: #ffe799;
+}
+
+.img-wrapper {
+  height: 40rem;
+}
+
+/*===========================================================
+      Search Page
+============================================================= */
