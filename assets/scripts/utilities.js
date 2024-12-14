@@ -1,7 +1,21 @@
-import { refreshPreview, previewBox, loader } from "/assets/scripts/index.js";
-const baseURL = "https://www.thecocktaildb.com/api/json/v1/1";
+// ===========================================================
+//        Imports
+// ===========================================================
+import {
+  loader,
+  previewBox,
+  refreshPreview,
+  searchDrink,
+} from "/assets/scripts/index.js";
 
 // ===========================================================
+//        References
+// ===========================================================
+const baseURL = "https://www.thecocktaildb.com/api/json/v1/1";
+const startPageBtns = document.querySelector(".start-page-buttons");
+const searchResults = document.querySelector(".search-results");
+
+// ==================================s=========================
 //        Map cocktail data
 // ===========================================================
 export function mapRawCocktailData(rawCocktail) {
@@ -60,14 +74,64 @@ export function insertPreviewToDom(mappedDrink) {
 //        Search Cocktails
 // ===========================================================
 
-// search.php?s=${cocktailName}
+export async function getSearchResult() {
+  const searchValue = document.querySelector("#search-field").value.trim();
+  const searchResults = document.querySelector(".search-results");
+
+  if (!searchValue) return;
+  try {
+    const apiRes = await fetch(`${baseURL}/search.php?s=${searchValue}`);
+    const rawSearchData = await apiRes.json();
+    console.log("Response Data:", rawSearchData);
+
+    if (!rawSearchData.drinks?.length) {
+      searchResults.innerHTML = "";
+      searchResults.innerHTML = /*html*/ `
+          <li class="search-result-card">
+            Could not find anything matching your search.
+          </li>`;
+      return;
+    }
+
+    const mappedSearch = rawSearchData.drinks.map(mapRawCocktailData);
+    insertSRToDom(mappedSearch);
+  } catch (error) {
+    console.error("Fetch error:", error);
+    searchResults.innerHTML = "";
+    searchResults.innerHTML = /*html*/ `
+        <li class="search-result-card">
+          There was an error getting your cocktails, please try again later.
+        </li>`;
+  }
+}
+
+function createSearchLi(drink) {
+  const srLi = /*html*/ `
+  <li class="search-result-card">
+  <div class="sr-thumb-wrapper">
+    <img class="sr-thumb" src="${drink.thumbnail}/preview" alt="${drink.name}">
+  </div>
+  <div class="sr-text-wrapper">
+    <h3 class="sr-drink-name">${drink.name}</h3>
+    <p class="sr-drink-id">ID: ${drink.id}</p>
+    <p class="sr-drink-tags">Tags: ${drink.tags.join(", ") || "None"}</p>
+  </div>
+  </li>`;
+
+  return srLi;
+}
+
+export function insertSRToDom(searchResult) {
+  const srLiHTML = searchResult.map((drink) => createSearchLi(drink)).join("");
+  searchResults.innerHTML = srLiHTML;
+}
 
 // ===========================================================
 //        Others...
 // ===========================================================
-document
-  .querySelector(".start-page-buttons")
-  .addEventListener("click", handleButtons);
+
+document.querySelector(".search-form").addEventListener("submit", searchDrink);
+startPageBtns.addEventListener("click", handleButtons);
 
 export function handleButtons(event) {
   const { target } = event;

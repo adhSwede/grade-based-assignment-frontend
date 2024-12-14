@@ -88,3 +88,23 @@ body {
 /*===========================================================
       Search Page
 ============================================================= */
+.search-results {
+  height: 75vh;
+  width: 95vw;
+  display: flex;
+  flex-direction: column;
+  overflow: scroll;
+}
+
+.search-result-card {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.sr-text-wrapper {
+  width: 100%;
+}
+
+.sr-thumb {
+  height: 5rem;
+}
