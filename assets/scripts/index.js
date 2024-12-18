@@ -9,6 +9,7 @@ import {
   insertSRToDom,
   getDetailedInfo,
   insertDetailsToDOM,
+  selectSearchType,
 } from "/assets/scripts/utilities.js";
 
 // ===========================================================
@@ -37,6 +38,7 @@ export function searchDrink(event) {
     insertSRToDom(sr);
   });
 }
+selectSearchType();
 
 // ===========================================================
 //        Details Page

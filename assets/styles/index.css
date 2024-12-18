@@ -118,6 +118,8 @@ Details Page
 }
 .details-page .dt-img-wrapper {
   border-radius: 20px;
+  object-fit: contain;
+  object-position: center;
   overflow: hidden;
 }
 

@@ -15,6 +15,7 @@ import {
 const baseURL = "https://www.thecocktaildb.com/api/json/v1/1";
 const detailsPage = document.querySelector(".details-page");
 const startPageBtns = document.querySelector(".start-page-buttons");
+const searchOptions = document.querySelector("#search-options");
 const searchResults = document.querySelector(".search-results");
 const searchPage = document.querySelector(".search-page");
 const startPage = document.querySelector(".start-page");
@@ -74,11 +75,20 @@ export function insertPreviewToDom(mappedDrink) {
 // ===========================================================
 
 export async function getSearchResult() {
-  const searchValue = document.querySelector("#search-field").value.trim();
+  const searchValue = getSearchType();
+
+  if (searchValue === "noInput") {
+    searchResults.innerHTML = /*html*/ `
+      <li class="search-result-card">
+      Choose an option, please!
+      </li>`;
+    return;
+  }
 
   if (!searchValue) return;
+
   try {
-    const apiRes = await fetch(`${baseURL}/search.php?s=${searchValue}`);
+    const apiRes = await fetch(`${searchValue}`);
     const rawSearchData = await apiRes.json();
     console.log("Response Data:", rawSearchData);
 
@@ -123,6 +133,53 @@ export async function insertSRToDom(searchResult) {
   searchResults.innerHTML = srLiHTML;
 }
 
+function getSearchType() {
+  const searchValue = document.querySelector("#search-name").value.trim();
+  const optValue = document.querySelector("#search-options").value;
+
+  if (!searchValue) {
+    return "noInput"; // Return a specific value to signal no input
+  }
+
+  if (optValue === "name") {
+    return `${baseURL}/search.php?s=${searchValue}`;
+  }
+  if (optValue === "category") {
+    return `${baseURL}/filter.php?c=${searchValue}`;
+  }
+  if (optValue === "ingredients") {
+    return `${baseURL}/filter.php?i=${searchValue}`;
+  }
+  if (optValue === "glass") {
+    return `${baseURL}/filter.php?g=${searchValue}`;
+  }
+  if (optValue === "alcohol") {
+    return `${baseURL}/filter.php?a=${searchValue}`;
+  }
+}
+
+// bit of a "hacky" solution because i didn't feel like messing with the other function again.
+export function selectSearchType() {
+  const searchOptions = document.querySelector("#search-options");
+  const showing = searchOptions.value;
+  const options = document.querySelectorAll(".search-types > *");
+  const searchBar = document.querySelector("#search-name");
+  const selectedOption = document.querySelector(
+    `.search-types #search-${showing}`
+  );
+
+  options.forEach((option) => option.classList.add("hide-section"));
+
+  if (selectedOption) {
+    selectedOption.classList.remove("hide-section");
+
+    selectedOption.addEventListener("change", (event) => {
+      const selectedValue = event.target.value;
+      searchBar.value = selectedValue;
+    });
+  }
+}
+
 // ===========================================================
 //        Details/See more...
 // ===========================================================
@@ -149,7 +206,9 @@ function createDetailCard(drink) {
           )
           .join("")}
       </ul>
-      <span class="dt-tags">${drink.tags.join(", ")}</span>
+      <ul class="dt-tags">
+        ${drink.tags.map((tag) => `<li>${tag}</li>`).join(" ")}
+      </ul>
       <p class="dt-instructions">${drink.instructions}</p>
     </aside>
   `;
@@ -169,6 +228,7 @@ export function insertDetailsToDOM(details) {
 document.querySelector(".search-form").addEventListener("submit", searchDrink);
 startPageBtns.addEventListener("click", handleOnClick);
 navBtns.addEventListener("click", handleOnClick);
+searchOptions.addEventListener("change", handleOnClick);
 searchResults.addEventListener("click", handleOnClick);
 
 export function idFromElement(event) {
@@ -192,6 +252,7 @@ export function handleOnClick(event) {
   const homeBtn = target.closest(".nav-buttons .home-btn");
   const randomBtn = target.closest(".start-page-buttons .random-btn");
   const searchBtn = target.closest(".nav-buttons .search-btn");
+  const searchOptions = target.closest("#search-options");
 
   if (detailsBtn || searchRes) {
     const id = idFromElement(event);
@@ -210,6 +271,10 @@ export function handleOnClick(event) {
 
   if (searchBtn) {
     showTab("search");
+  }
+
+  if (searchOptions) {
+    selectSearchType();
   }
 }
 
