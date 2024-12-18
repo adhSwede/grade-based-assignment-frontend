@@ -7,6 +7,8 @@ import {
   insertLoaderToDOM,
   getSearchResult,
   insertSRToDom,
+  getDetailedInfo,
+  insertDetailsToDOM,
 } from "/assets/scripts/utilities.js";
 
 // ===========================================================
@@ -33,5 +35,16 @@ export function searchDrink(event) {
   insertLoaderToDOM();
   getSearchResult().then((sr) => {
     insertSRToDom(sr);
+  });
+}
+
+// ===========================================================
+//        Details Page
+// ===========================================================
+export function createDetailsPage(drinkID) {
+  insertLoaderToDOM();
+  getDetailedInfo(drinkID).then((details) => {
+    console.log(details);
+    insertDetailsToDOM(details);
   });
 }

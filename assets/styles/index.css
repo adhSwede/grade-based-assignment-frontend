@@ -24,12 +24,12 @@ body {
   height: 80%;
 }
 
-.buttons {
+.nav-buttons {
   display: flex;
   gap: 0.5rem;
 }
 
-.buttons button {
+.nav-buttons button {
   padding: 1rem;
   width: 50%;
 }
@@ -37,9 +37,6 @@ body {
 /*===========================================================
       Start Page
 ============================================================= */
-.start-page {
-  display: none;
-}
 
 .random-drink-name {
   text-align: center;
@@ -107,4 +104,23 @@ body {
 
 .sr-thumb {
   height: 5rem;
+}
+
+/*===========================================================
+Details Page
+============================================================= */
+.details-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #ffe799;
+  border-radius: 20px;
+}
+.details-page .dt-img-wrapper {
+  border-radius: 20px;
+  overflow: hidden;
+}
+
+.hide-section {
+  display: none;
 }

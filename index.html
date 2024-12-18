@@ -10,7 +10,7 @@
   <body>
     <nav class="nav-bar">
       <img src="assets/images/logo.png" alt="logo" />
-      <div class="buttons">
+      <div class="nav-buttons">
         <button class="home-btn">HOME</button
         ><button class="search-btn">SEARCH</button>
       </div>
@@ -21,12 +21,12 @@
           <div class="loader"></div>
         </div>
         <div class="start-page-buttons">
-          <button class="details-btn">Details</button>
+          <button class="details-btn" data-id="11007">Details</button>
           <button class="random-btn">New Random</button>
         </div>
       </section>
 
-      <section class="search-page">
+      <section class="search-page hide-section">
         <form action="" class="search-form">
           <label for="search-field">Search Drink:</label>
           <input type="text" name="search-field" id="search-field" />
@@ -34,6 +34,8 @@
         </form>
         <ul class="search-results"></ul>
       </section>
+
+      <section class="details-page"><div class="details-box"></div></section>
     </main>
     <script src="assets/scripts/index.js" type="module"></script>
   </body>
