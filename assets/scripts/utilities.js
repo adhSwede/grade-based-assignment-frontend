@@ -2,8 +2,6 @@
 //        Imports
 // ===========================================================
 import {
-  loader,
-  previewBox,
   refreshPreview,
   searchDrink,
   createDetailsPage,
@@ -14,14 +12,16 @@ import {
 // ===========================================================
 const baseURL = "https://www.thecocktaildb.com/api/json/v1/1";
 const detailsPage = document.querySelector(".details-page");
-const startPageBtns = document.querySelector(".start-page-buttons");
-const searchOptions = document.querySelector("#search-options");
-const searchResults = document.querySelector(".search-results");
-const searchPage = document.querySelector(".search-page");
-const startPage = document.querySelector(".start-page");
+const loader = document.querySelector(".loader");
 const navBtns = document.querySelector(".nav-buttons");
+const previewBox = document.querySelector(".preview-box");
+const searchOptions = document.querySelector("#search-options");
+const searchPage = document.querySelector(".search-page");
+const searchResults = document.querySelector(".search-results");
+const startPage = document.querySelector(".start-page");
+const startPageBtns = document.querySelector(".start-page-buttons");
 
-// ==================================s=========================
+// ===========================================================
 //        Map cocktail data
 // ===========================================================
 export function mapRawCocktailData(rawCocktail) {
@@ -46,6 +46,8 @@ export function mapRawCocktailData(rawCocktail) {
 // ===========================================================
 //        Random Cocktail generation
 // ===========================================================
+
+// This was a really soft start, fetch the info, map it and build your card.
 export async function getRandomDrink() {
   const apiRes = await fetch(baseURL + "/random.php");
   const rawDrink = await apiRes.json();
@@ -73,44 +75,40 @@ export function insertPreviewToDom(mappedDrink) {
 // ===========================================================
 //        Search Cocktails
 // ===========================================================
+const pageTracker = {
+  results: [],
+  currentPage: 1,
+  totalPages: null,
+};
+// This is the simplest way i could come up with to handle the pages.
+// I designed it to work like a "state machine" to keep track of the data and pages.
 
 export async function getSearchResult() {
   const searchValue = getSearchType();
 
-  if (searchValue === "noInput") {
-    searchResults.innerHTML = /*html*/ `
-      <li class="search-result-card">
-      Choose an option, please!
-      </li>`;
-    return;
-  }
-
   if (!searchValue) return;
 
   try {
-    const apiRes = await fetch(`${searchValue}`);
+    const apiRes = await fetch(searchValue);
     const rawSearchData = await apiRes.json();
-    console.log("Response Data:", rawSearchData);
 
-    if (!rawSearchData.drinks?.length) {
-      searchResults.innerHTML = /*html*/ `
-      <li class="search-result-card">
-      We could not find anything matching your search.
-      </li>`;
-      return;
-    }
+    pageTracker.results = rawSearchData.drinks?.map(mapRawCocktailData) || [];
+    pageTracker.totalPages = Math.ceil(pageTracker.results.length / 10);
+    pageTracker.currentPage = 1;
+    // Had to build this part post reaching the "VG" part of the assignment,
+    // as my previous version couldn't handle counting pages.
 
-    const mappedSearch = rawSearchData.drinks.map(mapRawCocktailData);
-    insertSRToDom(mappedSearch);
+    updateSearchResults();
   } catch (error) {
     console.error("Fetch error:", error);
-    searchResults.innerHTML = /*html*/ `
-    <li class="search-result-card">
-    There was an error getting your cocktails, please try again later.
-    </li>`;
-  }
+    searchResults.innerHTML = `
+      <li class="search-result-card">
+      There was an error getting your cocktails, please try again later.
+      </li>`;
+  } // error message for everything not realted to the noInput state.
 }
 
+// simple create-a-card type function for the search li:s.
 function createSearchLi(drink) {
   const srLi = /*html*/ `
   <li class="search-result-card" data-id="${drink.id}">
@@ -133,12 +131,14 @@ export async function insertSRToDom(searchResult) {
   searchResults.innerHTML = srLiHTML;
 }
 
+// Made this multi-choice abomination to replace my original variables handling
+// the links.
 function getSearchType() {
   const searchValue = document.querySelector("#search-name").value.trim();
   const optValue = document.querySelector("#search-options").value;
 
   if (!searchValue) {
-    return "noInput"; // Return a specific value to signal no input
+    return "noInput";
   }
 
   if (optValue === "name") {
@@ -158,7 +158,8 @@ function getSearchType() {
   }
 }
 
-// bit of a "hacky" solution because i didn't feel like messing with the other function again.
+// Bit of a "hacky" solution because i didn't feel like messing with the other function again.
+// Basically what it does is it uses the old search field, but i force the input by hiding it, and setting the value based on the drop downs.
 export function selectSearchType() {
   const searchOptions = document.querySelector("#search-options");
   const showing = searchOptions.value;
@@ -180,9 +181,48 @@ export function selectSearchType() {
   }
 }
 
+// This whole last section is just to accommodate the pagination and "page turning".
+function changePage(dir) {
+  if (dir === "next" && pageTracker.currentPage < pageTracker.totalPages) {
+    pageTracker.currentPage++;
+    updateSearchResults();
+  } else if (dir === "prev" && pageTracker.currentPage > 1) {
+    pageTracker.currentPage--;
+    updateSearchResults();
+  }
+}
+
+function updateSearchResults() {
+  const startIndex = (pageTracker.currentPage - 1) * 10;
+  const endIndex = pageTracker.currentPage * 10;
+  const pageResults = pageTracker.results.slice(startIndex, endIndex);
+
+  insertSRToDom(pageResults);
+
+  document.querySelector(
+    ".page-count"
+  ).textContent = `Page ${pageTracker.currentPage} of ${pageTracker.totalPages}`;
+}
+
 // ===========================================================
 //        Details/See more...
 // ===========================================================
+
+// Gets the id of an element (search result or the random gen.) so that i can use it to fetch the details.
+export function idFromElement(event) {
+  const previewCard = document.querySelector(".preview-card");
+  const detailsBtn = event.target.closest(".details-btn");
+  const searchRes = event.target.closest(".search-result-card");
+
+  if (detailsBtn) {
+    return previewCard.dataset.id;
+  }
+
+  if (searchRes) {
+    return searchRes.dataset.id;
+  }
+}
+
 export async function getDetailedInfo(drinkID) {
   const detailRes = await fetch(`${baseURL}/lookup.php?i=${drinkID}`);
   const rawDetails = await detailRes.json();
@@ -215,6 +255,7 @@ function createDetailCard(drink) {
   return detailCard;
 }
 
+// Liked this naming convention so much when i saw the teacher using it so i keep calling things "insert...ToDom"
 export function insertDetailsToDOM(details) {
   const detailsHTML = details.map((drink) => createDetailCard(drink)).join("");
 
@@ -225,26 +266,16 @@ export function insertDetailsToDOM(details) {
 //        Others...
 // ===========================================================
 
+// ############# Event Listeners #############
+document.querySelector("#prev-btn").addEventListener("click", handleOnClick);
+document.querySelector("#next-btn").addEventListener("click", handleOnClick);
 document.querySelector(".search-form").addEventListener("submit", searchDrink);
 startPageBtns.addEventListener("click", handleOnClick);
 navBtns.addEventListener("click", handleOnClick);
 searchOptions.addEventListener("change", handleOnClick);
 searchResults.addEventListener("click", handleOnClick);
 
-export function idFromElement(event) {
-  const previewCard = document.querySelector(".preview-card");
-  const detailsBtn = event.target.closest(".details-btn");
-  const searchRes = event.target.closest(".search-result-card");
-
-  if (detailsBtn) {
-    return previewCard.dataset.id;
-  }
-
-  if (searchRes) {
-    return searchRes.dataset.id;
-  }
-}
-
+// After a while it felt silly to keep adding it all into the same event handler, but byt then i was already too deep.
 export function handleOnClick(event) {
   const { target } = event;
   const detailsBtn = target.closest(".details-btn");
@@ -253,6 +284,8 @@ export function handleOnClick(event) {
   const randomBtn = target.closest(".start-page-buttons .random-btn");
   const searchBtn = target.closest(".nav-buttons .search-btn");
   const searchOptions = target.closest("#search-options");
+  const nextBtn = target.closest(".search-page-buttons #next-btn");
+  const prevBtn = target.closest(".search-page-buttons #prev-btn");
 
   if (detailsBtn || searchRes) {
     const id = idFromElement(event);
@@ -276,9 +309,17 @@ export function handleOnClick(event) {
   if (searchOptions) {
     selectSearchType();
   }
+
+  if (nextBtn) {
+    changePage("next");
+  }
+
+  if (prevBtn) {
+    changePage("prev");
+  }
 }
 
-// Added because it was getting crowded in my click handler.
+// Added because it was getting crowded in my click handler wich really didn't need more code.
 export function showTab(showing) {
   const dList = detailsPage.classList;
   const stList = startPage.classList;
@@ -297,6 +338,7 @@ export function showTab(showing) {
   }
 }
 
+// So far i only used this on the random generator...
 export function insertLoaderToDOM() {
   previewBox.innerHTML = loader.outerHTML;
 }

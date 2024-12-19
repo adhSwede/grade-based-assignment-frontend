@@ -86,20 +86,37 @@ body {
       Search Page
 ============================================================= */
 .search-results {
-  height: 75vh;
+  height: 70vh;
   width: 95vw;
-  display: flex;
-  flex-direction: column;
-  overflow: scroll;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1rem; /* Add some spacing between cards */
+  overflow-y: auto; /* Scrollable if content overflows */
 }
 
 .search-result-card {
-  display: flex;
-  justify-content: flex-start;
+  display: grid;
+  grid-template-columns: 5rem auto;
+  align-items: center;
+  gap: 1rem; /* Space between thumbnail and text */
+  padding: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  background-color: #fff; /* Optional: Card background */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Slight shadow */
+}
+
+.sr-thumb {
+  height: 5rem;
+  width: 5rem;
+  object-fit: cover;
+  border-radius: 0.5rem; /* Optional: Rounded corners for the image */
 }
 
 .sr-text-wrapper {
-  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Space between text elements */
 }
 
 .sr-thumb {

@@ -13,11 +13,6 @@ import {
 } from "/assets/scripts/utilities.js";
 
 // ===========================================================
-//        References
-// ===========================================================
-export const previewBox = document.querySelector(".preview-box");
-export const loader = document.querySelector(".loader");
-// ===========================================================
 //        Start Page
 // ===========================================================
 export function refreshPreview() {
