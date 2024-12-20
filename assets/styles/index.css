@@ -47,6 +47,11 @@ body {
   background-color: var(--surface);
 }
 
+.preview-box {
+  min-height: 60vh;
+  aspect-ratio: 1;
+}
+
 .logo {
   height: 12rem;
   width: 12rem;
