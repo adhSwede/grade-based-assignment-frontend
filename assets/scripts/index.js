@@ -11,7 +11,7 @@ import {
   getDetailedInfo,
   insertDetailsToDOM,
   selectSearchType,
-} from "/assets/scripts/utilities.js";
+} from "/utilities.js";
 
 // ===========================================================
 //        Start Page
