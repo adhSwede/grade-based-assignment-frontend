@@ -270,7 +270,7 @@ function createDetailCard(drink) {
     <ul class="dt-tags">
     ${drink.tags.map((tag) => `<li>${tag}</li>`).join(" ")}
     </ul>
-    <button class="like-btn" data-id="${drink.id}">
+    <button class="like-btn dt-like-btn" data-id="${drink.id}">
       <span class="material-icons">
         ${likes.includes(drink.id) ? "favorite" : "favorite_border"}
       </span>

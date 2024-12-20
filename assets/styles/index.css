@@ -298,6 +298,7 @@ Details Page
   background-color: var(--surface);
   display: flex;
   border-radius: 15px;
+  max-height: max-content;
 }
 
 .dt-name {
@@ -323,6 +324,7 @@ Details Page
 }
 
 .dt-info {
+  position: relative;
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
@@ -339,7 +341,7 @@ Details Page
   border: none;
   width: fit-content;
   left: 90%;
-  bottom: 8%;
+  bottom: 20%;
 }
 
 .details-page button span {
@@ -369,7 +371,6 @@ Details Page
   margin-top: 1rem;
   color: var(--secondary);
 }
-
 /*===========================================================
     Favorites page
 =============================================================*/
