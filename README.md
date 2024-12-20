@@ -31,7 +31,7 @@ We were tasked with using [The Cocktail DB's](https://www.thecocktaildb.com) API
 
 ![Search Page](/assets/images/Screenshots/search.png)
 
-### Objectives for VG (_Doesn't translate to Very Good but for all intents an purposes it works here_)
+## Objectives for VG (_Doesn't translate to Very Good but for all intents an purposes it works here_)
 
 ## Search page ++
 
