@@ -300,6 +300,15 @@ Details Page
   border-radius: 15px;
 }
 
+.dt-name {
+  font-size: 2rem;
+  color: var(--primary);
+}
+
+.dt-ctg {
+  font-weight: bold;
+}
+
 .dt-img-wrapper {
   box-sizing: border-box;
   overflow: hidden;
@@ -324,10 +333,6 @@ Details Page
   gap: 0.5rem;
 }
 
-.details-page li {
-  list-style-type: square;
-}
-
 .details-page button {
   position: relative;
   background-color: transparent;
@@ -339,6 +344,30 @@ Details Page
 
 .details-page button span {
   font-size: 3rem;
+}
+
+.dt-tags {
+  display: flex;
+  gap: 1rem;
+}
+
+.dt-tags li {
+  list-style-type: none;
+  list-style: none;
+  background-color: var(--primary);
+  color: var(--background);
+  font-weight: bold;
+  padding: 0 3px;
+  border-radius: 5px;
+}
+
+.dt-glass {
+  background-color: var(--background);
+  padding: 0.5rem;
+  text-align: center;
+  border-radius: 5px;
+  margin-top: 1rem;
+  color: var(--secondary);
 }
 
 /*===========================================================

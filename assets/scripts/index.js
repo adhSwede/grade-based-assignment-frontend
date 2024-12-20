@@ -42,7 +42,7 @@ selectSearchType();
 export function createDetailsPage(drinkID) {
   insertLoaderToDOM();
   getDetailedInfo(drinkID).then((details) => {
-    console.log(details);
+    // console.log(details);
     insertDetailsToDOM(details);
   });
 }

@@ -265,12 +265,17 @@ function createDetailCard(drink) {
       drink.thumbnail
     }" alt="${drink.name}" /></div>
     <aside class="dt-info">
-      <h3 class="dt-name">${drink.name}</h3>
-      <button class="like-btn" data-id="${drink.id}">
-        <span class="material-icons">
-          ${likes.includes(drink.id) ? "favorite" : "favorite_border"}
-        </span>
-      </button>
+    <h3 class="dt-name">${drink.name}</h3>
+    <p class= dt-ctg>${drink.category}</p>
+    <ul class="dt-tags">
+    ${drink.tags.map((tag) => `<li>${tag}</li>`).join(" ")}
+    </ul>
+    <button class="like-btn" data-id="${drink.id}">
+      <span class="material-icons">
+        ${likes.includes(drink.id) ? "favorite" : "favorite_border"}
+      </span>
+    </button>
+      <p></p>
       <ul class="dt-ingredients">
         ${drink.ingredients
           .map(
@@ -279,10 +284,8 @@ function createDetailCard(drink) {
           )
           .join("")}
       </ul>
-      <ul class="dt-tags">
-        ${drink.tags.map((tag) => `<li>${tag}</li>`).join(" ")}
-      </ul>
       <p class="dt-instructions">${drink.instructions}</p>
+      <p class= dt-glass>Best served in: ${drink.glass}</p>
     </aside>
   `;
   return detailCard;
