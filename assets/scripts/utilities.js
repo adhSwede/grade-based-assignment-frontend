@@ -1,7 +1,11 @@
 // ===========================================================
 //        Imports
 // ===========================================================
-import { refreshPreview, searchDrink, createDetailsPage } from "/index.js";
+import {
+  refreshPreview,
+  searchDrink,
+  createDetailsPage,
+} from "/assets/scripts/index.js";
 
 // ===========================================================
 //        References
