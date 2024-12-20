@@ -20,6 +20,7 @@ const searchPage = document.querySelector(".search-page");
 const searchResults = document.querySelector(".search-results");
 const startPage = document.querySelector(".start-page");
 const startPageBtns = document.querySelector(".start-page-buttons");
+const favPage = document.querySelector(".fav-page");
 
 // ===========================================================
 //        Map cocktail data
@@ -58,9 +59,19 @@ export async function getRandomDrink() {
 
 function createPreview(drink) {
   const preview = /*html*/ `
-  <article class="preview-card" data-id="${drink.id}">
-    <h3 class="random-drink-name">${drink.name}</h3>
-    <div class="img-wrapper"><img src="${drink.thumbnail}" alt=""></div></article>
+    <article class="preview-card" data-id="${drink.id}">
+     <div class="random-card-top">
+      <h3 class="random-drink-name">${drink.name}</h3>
+      <button class="like-btn" data-id="${drink.id}">
+        <span class="material-icons">${
+          likes.includes(drink.id) ? "favorite" : "favorite_border"
+        }</span>
+      </button>
+      </div>
+      <div class="img-wrapper"><img src="${drink.thumbnail}" alt="${
+    drink.name
+  }"></div>
+    </article>
   `;
   return preview;
 }
@@ -69,7 +80,9 @@ export function insertPreviewToDom(mappedDrink) {
   const randomDrinkHTML = mappedDrink
     .map((drink) => createPreview(drink))
     .join("");
+
   previewBox.innerHTML = randomDrinkHTML;
+  mappedDrink.forEach((drink) => updateLikeUI(drink.id));
 }
 
 // ===========================================================
@@ -119,6 +132,11 @@ function createSearchLi(drink) {
   <h3 class="sr-drink-name">${drink.name}</h3>
   <p class="sr-drink-id">ID: ${drink.id}</p>
   <p class="sr-drink-tags">Tags: ${drink.tags.join(", ") || "None"}</p>
+  <button class="like-btn" data-id="${drink.id}">
+  <span class="material-icons">${
+    likes.includes(drink.id) ? "favorite" : "favorite_border"
+  }</span>
+  </button>
   </div>
   </li>`;
 
@@ -131,30 +149,30 @@ export async function insertSRToDom(searchResult) {
   searchResults.innerHTML = srLiHTML;
 }
 
-// Made this multi-choice abomination to replace my original variables handling
-// the links.
+// Made this multi-choice abomination to replace my original variables handling links.
+// i found it easier to just inpuut the whole string than to m
 function getSearchType() {
-  const searchValue = document.querySelector("#search-name").value.trim();
+  const userSearch = document.querySelector("#search-name").value.trim();
   const optValue = document.querySelector("#search-options").value;
 
-  if (!searchValue) {
+  if (!userSearch) {
     return "noInput";
   }
 
   if (optValue === "name") {
-    return `${baseURL}/search.php?s=${searchValue}`;
+    return `${baseURL}/search.php?s=${userSearch}`;
   }
   if (optValue === "category") {
-    return `${baseURL}/filter.php?c=${searchValue}`;
+    return `${baseURL}/filter.php?c=${userSearch}`;
   }
   if (optValue === "ingredients") {
-    return `${baseURL}/filter.php?i=${searchValue}`;
+    return `${baseURL}/filter.php?i=${userSearch}`;
   }
   if (optValue === "glass") {
-    return `${baseURL}/filter.php?g=${searchValue}`;
+    return `${baseURL}/filter.php?g=${userSearch}`;
   }
   if (optValue === "alcohol") {
-    return `${baseURL}/filter.php?a=${searchValue}`;
+    return `${baseURL}/filter.php?a=${userSearch}`;
   }
 }
 
@@ -238,6 +256,11 @@ function createDetailCard(drink) {
     }" alt="${drink.name}" /></div>
     <aside class="dt-info">
       <h3 class="dt-name">${drink.name}</h3>
+      <button class="like-btn" data-id="${drink.id}">
+        <span class="material-icons">
+          ${likes.includes(drink.id) ? "favorite" : "favorite_border"}
+        </span>
+      </button>
       <ul class="dt-ingredients">
         ${drink.ingredients
           .map(
@@ -261,6 +284,92 @@ export function insertDetailsToDOM(details) {
 
   detailsPage.innerHTML = detailsHTML;
 }
+// ===========================================================
+//        Favorites/LS
+// ===========================================================
+
+// This whole section was built to store and handle the "likes"; Originally i was going with the more traditional "favorites",
+//  but i like shorter functions and "liking" feels more modern.
+let likes = JSON.parse(localStorage.getItem("likes")) || [];
+
+async function insertFavorites() {
+  const favoritesList = document.querySelector(".favorites-list");
+
+  favoritesList.innerHTML = ""; // Clear previous content
+
+  if (likes.length === 0) {
+    favoritesList.innerHTML =
+      "<li class='no-favorites-message'>No favorites yet! Start liking some drinks.</li>";
+    return;
+  }
+
+  try {
+    const favoritesDetails = await Promise.all(
+      likes.map(async (id) => {
+        const rawDetails = await getDetailsById(id);
+        return mapRawCocktailData(rawDetails);
+      })
+    );
+
+    favoritesDetails.forEach((drink) => {
+      const li = document.createElement("li");
+      li.classList.add("fav-list-item");
+      li.innerHTML = /*html*/ `
+        <article class="fav-card" data-id="${drink.id}">
+          <h3 class="fav-card-title">${drink.name}</h3>
+          <button class="like-btn" data-id="${drink.id}">
+            <span class="material-icons">${
+              likes.includes(drink.id) ? "favorite" : "favorite_border"
+            }</span>
+          </button>
+          <div class="fav-img-wrapper">
+            <img src="${drink.thumbnail}" alt="${drink.name}" />
+          </div>
+        </article>`;
+      favoritesList.appendChild(li);
+    });
+  } catch (error) {
+    console.error("Error inserting favorites:", error);
+    favoritesList.innerHTML =
+      "<li class='error-message'>There was an error loading your favorites. Please try again later.</li>";
+  }
+}
+
+// Had to add extra checks because every timed it saved likes it kept duplicating them.
+function toggleLikes(id) {
+  if (likes.includes(id)) {
+    likes = likes.filter((likedId) => likedId !== id);
+  } else {
+    likes.push(id);
+  }
+
+  updateStoredLikes();
+  updateLikeUI(id);
+
+  if (!favPage.classList.contains("hide-section")) {
+    insertFavorites();
+  }
+}
+
+function updateStoredLikes() {
+  // De-duplicate before saving
+  likes = [...new Set(likes)];
+  localStorage.setItem("likes", JSON.stringify(likes));
+}
+
+function updateLikeUI(id) {
+  const buttons = document.querySelectorAll(`.like-btn[data-id="${id}"]`);
+  buttons.forEach((button) => {
+    const icon = button.querySelector(".material-icons");
+    icon.textContent = likes.includes(id) ? "favorite" : "favorite_border";
+  });
+}
+
+async function getDetailsById(id) {
+  const apiRes = await fetch(`${baseURL}/lookup.php?i=${id}`);
+  const rawDetails = await apiRes.json();
+  return rawDetails.drinks?.[0];
+}
 
 // ===========================================================
 //        Others...
@@ -274,6 +383,9 @@ startPageBtns.addEventListener("click", handleOnClick);
 navBtns.addEventListener("click", handleOnClick);
 searchOptions.addEventListener("change", handleOnClick);
 searchResults.addEventListener("click", handleOnClick);
+previewBox.addEventListener("click", handleOnClick);
+favPage.addEventListener("click", handleOnClick);
+detailsPage.addEventListener("click", handleOnClick);
 
 // After a while it felt silly to keep adding it all into the same event handler, but byt then i was already too deep.
 export function handleOnClick(event) {
@@ -286,6 +398,22 @@ export function handleOnClick(event) {
   const searchOptions = target.closest("#search-options");
   const nextBtn = target.closest(".search-page-buttons #next-btn");
   const prevBtn = target.closest(".search-page-buttons #prev-btn");
+  const favBtn = target.closest(".fav-btn");
+  const likeBtn = target.closest(".like-btn");
+  const favCard = target.closest(".fav-card");
+
+  if (likeBtn) {
+    const drinkId = likeBtn.dataset.id;
+    toggleLikes(drinkId);
+    return;
+  }
+
+  if (favCard) {
+    const drinkId = favCard.dataset.id;
+    createDetailsPage(drinkId);
+    showTab("details");
+    return;
+  }
 
   if (detailsBtn || searchRes) {
     const id = idFromElement(event);
@@ -317,6 +445,12 @@ export function handleOnClick(event) {
   if (prevBtn) {
     changePage("prev");
   }
+
+  if (favBtn) {
+    showTab("likes");
+    insertFavorites();
+    return;
+  }
 }
 
 // Added because it was getting crowded in my click handler wich really didn't need more code.
@@ -324,10 +458,12 @@ export function showTab(showing) {
   const dList = detailsPage.classList;
   const stList = startPage.classList;
   const srList = searchPage.classList;
+  const favList = favPage.classList;
 
   stList.add("hide-section");
   srList.add("hide-section");
   dList.add("hide-section");
+  favList.add("hide-section");
 
   if (showing === "details") {
     dList.remove("hide-section");
@@ -335,6 +471,8 @@ export function showTab(showing) {
     srList.remove("hide-section");
   } else if (showing === "start") {
     stList.remove("hide-section");
+  } else if (showing === "likes") {
+    favList.remove("hide-section");
   }
 }
 

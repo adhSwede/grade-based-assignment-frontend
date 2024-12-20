@@ -6,13 +6,24 @@
     <title>Exam - Name</title>
     <link rel="stylesheet" href="assets/styles/index.css" />
     <link rel="stylesheet" href="assets/styles/loader.css" />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/icon?family=Material+Icons"
+    />
   </head>
   <body>
     <nav class="nav-bar">
-      <img src="assets/images/logo.png" alt="logo" />
+      <img
+        src="assets/images/temp20241219-6126-1x62j5n.png"
+        alt="logo"
+        class="logo"
+      />
+      <h1 class="logo-text">Pour Decisions</h1>
+      <text></text>
       <div class="nav-buttons">
-        <button class="home-btn">HOME</button
-        ><button class="search-btn">SEARCH</button>
+        <button class="home-btn material-icons">home</button>
+        <button class="search-btn material-icons">search</button>
+        <button class="fav-btn material-icons">favorite</button>
       </div>
     </nav>
     <main class="main-content">
@@ -21,15 +32,17 @@
           <div class="loader"></div>
         </div>
         <div class="start-page-buttons">
-          <button class="details-btn" data-id="11007">Details</button>
-          <button class="random-btn">New Random</button>
+          <button class="details-btn material-icons" data-id="11007">
+            menu_book
+          </button>
+          <button class="random-btn material-icons">casino</button>
         </div>
       </section>
 
       <section class="search-page hide-section">
         <form action="" class="search-form">
-          <label for="search-field">Search Drink:</label>
           <div class="search-types">
+            <label for="search-field">Search Drink:</label>
             <input type="text" name="search-name" id="search-name" />
             <select name="search-cat" id="search-category">
               <option value="" disabled selected>Choose a category</option>
@@ -191,7 +204,6 @@
               <option value="Optional_alcohol">Optional Alcohol</option>
             </select>
           </div>
-          <label for="search-options">By:</label>
           <select name="search-options" id="search-options">
             <option value="name">Name</option>
             <option value="category">Category</option>
@@ -199,18 +211,21 @@
             <option value="glass">Glasstype</option>
             <option value="alcohol">Alcohol</option>
           </select>
-          <input type="submit" value="Search" />
+          <input class="material-icons" type="submit" value="search" />
         </form>
         <ul class="search-results"></ul>
         <div class="search-page-buttons">
-          <button id="prev-btn">Previous</button>
-          <button id="next-btn">Next</button>
+          <button id="prev-btn" class="material-icons">west</button>
+          <button id="next-btn" class="material-icons">east</button>
         </div>
         <span class="page-count"></span>
       </section>
-
       <section class="details-page hide-section">
         <div class="details-box"></div>
+      </section>
+      <section class="fav-page hide-section">
+        <h2>Your Favorite Cocktails</h2>
+        <ul class="favorites-list"></ul>
       </section>
     </main>
     <script src="assets/scripts/index.js" type="module"></script>
