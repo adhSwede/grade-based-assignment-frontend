@@ -2,6 +2,7 @@
 //        Imports
 // ===========================================================
 import {
+  // for imports and exports i tried to look in postr for unnecessary onse, but i couldn't find any.
   getRandomDrink,
   insertPreviewToDom,
   insertLoaderToDOM,
@@ -20,7 +21,7 @@ export function refreshPreview() {
   getRandomDrink().then((drink) => {
     insertPreviewToDom(drink);
   });
-}
+} // These all follow a then() order our teacher showed.
 refreshPreview();
 
 // ===========================================================

@@ -12,6 +12,7 @@ import {
 // ===========================================================
 const baseURL = "https://www.thecocktaildb.com/api/json/v1/1";
 const detailsPage = document.querySelector(".details-page");
+const favPage = document.querySelector(".fav-page");
 const loader = document.querySelector(".loader");
 const navBtns = document.querySelector(".nav-buttons");
 const previewBox = document.querySelector(".preview-box");
@@ -20,11 +21,13 @@ const searchPage = document.querySelector(".search-page");
 const searchResults = document.querySelector(".search-results");
 const startPage = document.querySelector(".start-page");
 const startPageBtns = document.querySelector(".start-page-buttons");
-const favPage = document.querySelector(".fav-page");
+// had no smart order for these, so went alphabetically, from the variable names.
 
 // ===========================================================
 //        Map cocktail data
 // ===========================================================
+
+// this function was made by our teacher to help us map the raw cocktail data.
 export function mapRawCocktailData(rawCocktail) {
   return {
     id: rawCocktail.idDrink,
@@ -55,8 +58,10 @@ export async function getRandomDrink() {
   const mappedDrink = rawDrink.drinks.map(mapRawCocktailData);
 
   return mappedDrink;
-}
+} // I ended up reusing some version of this for most API calls.
+// It's a variation i made up based on what we've been shown in the lesson repos.
 
+// Create a preview card/page for the random drink generator.
 function createPreview(drink) {
   const preview = /*html*/ `
     <article class="preview-card" data-id="${drink.id}">
@@ -76,6 +81,8 @@ function createPreview(drink) {
   return preview;
 }
 
+// Again this is a variation of what we've been doing in class. The name however I got from the teacher.
+// I ended up agreeing with this naming convention so much I named all similar functions "insert...ToDOM"
 export function insertPreviewToDom(mappedDrink) {
   const randomDrinkHTML = mappedDrink
     .map((drink) => createPreview(drink))
@@ -83,7 +90,7 @@ export function insertPreviewToDom(mappedDrink) {
 
   previewBox.innerHTML = randomDrinkHTML;
   mappedDrink.forEach((drink) => updateLikeUI(drink.id));
-}
+} // Slight modification i added for the favorites system.
 
 // ===========================================================
 //        Search Cocktails
@@ -107,9 +114,8 @@ export async function getSearchResult() {
 
     pageTracker.results = rawSearchData.drinks?.map(mapRawCocktailData) || [];
     pageTracker.totalPages = Math.ceil(pageTracker.results.length / 10);
+    // Make the las page count even if there is not enough items to fill it.
     pageTracker.currentPage = 1;
-    // Had to build this part post reaching the "VG" part of the assignment,
-    // as my previous version couldn't handle counting pages.
 
     updateSearchResults();
   } catch (error) {
@@ -118,7 +124,7 @@ export async function getSearchResult() {
       <li class="search-result-card">
       There was an error getting your cocktails, please try again later.
       </li>`;
-  } // error message for everything not realted to the noInput state.
+  }
 }
 
 // simple create-a-card type function for the search li:s.
@@ -139,10 +145,12 @@ function createSearchLi(drink) {
   </button>
   </div>
   </li>`;
+  // Had to fill in the like button later, as i did all the tasks in the order they were presented.
 
   return srLi;
 }
 
+// another "insert...ToDom" function. THis time i thought an li would be fitting, since they could all gop in a ul.
 export async function insertSRToDom(searchResult) {
   console.log(searchResult);
   const srLiHTML = searchResult.map((drink) => createSearchLi(drink)).join("");
@@ -150,7 +158,7 @@ export async function insertSRToDom(searchResult) {
 }
 
 // Made this multi-choice abomination to replace my original variables handling links.
-// i found it easier to just inpuut the whole string than to m
+// i found it easier to just replace the whole string here.
 function getSearchType() {
   const userSearch = document.querySelector("#search-name").value.trim();
   const optValue = document.querySelector("#search-options").value;
@@ -176,7 +184,7 @@ function getSearchType() {
   }
 }
 
-// Bit of a "hacky" solution because i didn't feel like messing with the other function again.
+// Bit of a "hacky" solution because i didn't feel like messing with the above function again.
 // Basically what it does is it uses the old search field, but i force the input by hiding it, and setting the value based on the drop downs.
 export function selectSearchType() {
   const searchOptions = document.querySelector("#search-options");
@@ -207,7 +215,7 @@ function changePage(dir) {
   } else if (dir === "prev" && pageTracker.currentPage > 1) {
     pageTracker.currentPage--;
     updateSearchResults();
-  }
+  } // i don't now if people do this in java but in C# dir is a pretty common variable for direction so i named it dir.
 }
 
 function updateSearchResults() {
@@ -227,6 +235,7 @@ function updateSearchResults() {
 // ===========================================================
 
 // Gets the id of an element (search result or the random gen.) so that i can use it to fetch the details.
+// It was a little tricky, as I had no knowledge of dataset id's prior to this assignment, and had to read up on them.
 export function idFromElement(event) {
   const previewCard = document.querySelector(".preview-card");
   const detailsBtn = event.target.closest(".details-btn");
@@ -241,6 +250,7 @@ export function idFromElement(event) {
   }
 }
 
+// Api call for details.
 export async function getDetailedInfo(drinkID) {
   const detailRes = await fetch(`${baseURL}/lookup.php?i=${drinkID}`);
   const rawDetails = await detailRes.json();
@@ -276,9 +286,9 @@ function createDetailCard(drink) {
     </aside>
   `;
   return detailCard;
-}
+} // Yet another card where i had to insert the like function in post.
 
-// Liked this naming convention so much when i saw the teacher using it so i keep calling things "insert...ToDom"
+// I keep calling things "insert...ToDom", It\s just really descriptive, i guess.
 export function insertDetailsToDOM(details) {
   const detailsHTML = details.map((drink) => createDetailCard(drink)).join("");
 
@@ -296,20 +306,19 @@ async function insertFavorites() {
   const favoritesList = document.querySelector(".favorites-list");
 
   favoritesList.innerHTML = ""; // Clear previous content
-
   if (likes.length === 0) {
     favoritesList.innerHTML =
       "<li class='no-favorites-message'>No favorites yet! Start liking some drinks.</li>";
     return;
-  }
+  } // It looked empty on the favorites screen when there was nothing there so i ended up making a message.
 
   try {
     const favoritesDetails = await Promise.all(
       likes.map(async (id) => {
         const rawDetails = await getDetailsById(id);
         return mapRawCocktailData(rawDetails);
-      })
-    );
+      }) // Never heard of promise.all() until i saw it discussed on stack overflow.
+    ); // It works almost as a loop but for multiple api responses.
 
     favoritesDetails.forEach((drink) => {
       const li = document.createElement("li");
@@ -335,7 +344,9 @@ async function insertFavorites() {
   }
 }
 
-// Had to add extra checks because every timed it saved likes it kept duplicating them.
+// Had to add extra checks because every time it saved likes it kept duplicating them.
+// Found out later it was because i had added two eventlisteners, one on the parent and one on the button.
+// making every click add two of the same favorite.
 function toggleLikes(id) {
   if (likes.includes(id)) {
     likes = likes.filter((likedId) => likedId !== id);
@@ -352,10 +363,9 @@ function toggleLikes(id) {
 }
 
 function updateStoredLikes() {
-  // De-duplicate before saving
   likes = [...new Set(likes)];
   localStorage.setItem("likes", JSON.stringify(likes));
-}
+} // Used a set to remove the dupes i THOUGHT was caused by something i did with the rendering.
 
 function updateLikeUI(id) {
   const buttons = document.querySelectorAll(`.like-btn[data-id="${id}"]`);
@@ -386,6 +396,7 @@ searchResults.addEventListener("click", handleOnClick);
 previewBox.addEventListener("click", handleOnClick);
 favPage.addEventListener("click", handleOnClick);
 detailsPage.addEventListener("click", handleOnClick);
+// I know this is kind of a mess but i don't know how to clean it up.
 
 // After a while it felt silly to keep adding it all into the same event handler, but byt then i was already too deep.
 export function handleOnClick(event) {
@@ -406,6 +417,7 @@ export function handleOnClick(event) {
     const drinkId = likeBtn.dataset.id;
     toggleLikes(drinkId);
     return;
+    // I added return on some of these in another try to stop the duplicates before i figured out what was happening.
   }
 
   if (favCard) {
@@ -454,6 +466,8 @@ export function handleOnClick(event) {
 }
 
 // Added because it was getting crowded in my click handler wich really didn't need more code.
+// I found it easier just hiding everything and unhiding whatever needed showing,
+// than checking what was showing every time.
 export function showTab(showing) {
   const dList = detailsPage.classList;
   const stList = startPage.classList;
