@@ -5,7 +5,7 @@ import {
   refreshPreview,
   searchDrink,
   createDetailsPage,
-} from "/assets/scripts/index.js";
+} from "assets/scripts/index.js";
 
 // ===========================================================
 //        References
